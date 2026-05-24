@@ -7,7 +7,6 @@ use iced::alignment::Horizontal;
 use iced::widget::text_input;
 use iced::widget::{container, scrollable};
 use iced::widget::{text, Column};
-use iced::Length::Fill;
 use iced::{Color, Length};
 use iced::{Element, Task, Theme};
 
@@ -73,7 +72,13 @@ impl Skribi {
         );
 
         for p in self.document.paragraphes.iter() {
-            elements.push(text(&p.contenu).size(16).into());
+            let size = match p.style {
+                StyleParagraphe::Titre1 => 24.0,
+                StyleParagraphe::Normal => 16.0,
+                StyleParagraphe::Titre2 => 20.0,
+                StyleParagraphe::Citation => 16.0,
+            };
+            elements.push(text(&p.contenu).size(size).into());
         }
 
         container(scrollable(
