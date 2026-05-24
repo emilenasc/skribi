@@ -3,6 +3,7 @@ mod paragraphe;
 
 use crate::document::Document;
 use crate::paragraphe::{Paragraphe, StyleParagraphe};
+use iced::widget::text_input;
 use iced::widget::{text, Column};
 use iced::{Element, Task, Theme};
 
@@ -15,12 +16,13 @@ pub fn main() -> iced::Result {
 // L'état de l'application
 struct Skribi {
     document: Document,
+    contenu_brut: String,
 }
 
 // Les messages — ce que l'utilisateur peut faire
 #[derive(Debug, Clone)]
 enum Message {
-    Rien,
+    ContentChanged(String),
 }
 
 impl Skribi {
@@ -34,14 +36,16 @@ impl Skribi {
 
         Skribi {
             document: Document { paragraphes },
+            contenu_brut: String::new(),
         }
     }
 
     // Modifie l'état selon le message
     fn update(&mut self, message: Message) -> Task<Message> {
         match message {
-            Message::Rien => Task::none(),
-        }
+            Message::ContentChanged(content) => self.contenu_brut = content,
+        };
+        Task::none()
     }
 
     // Dessine l'interface
@@ -52,7 +56,10 @@ impl Skribi {
             paragraph.push(text(&p.contenu).size(16).into());
         }
 
-        Column::with_children(paragraph).padding(40).into()
+        Column::with_children(paragraph)
+            .push(text_input("placeholder", &self.contenu_brut).on_input(Message::ContentChanged))
+            .padding(40)
+            .into()
     }
 
     fn theme(&self) -> Theme {
