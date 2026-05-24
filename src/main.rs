@@ -57,7 +57,8 @@ impl Skribi {
         }
 
         Column::with_children(paragraph)
-            .push(text_input("placeholder", &self.contenu_brut).on_input(Message::ContentChanged))
+            .push(text_input("placeholder", &self.contenu_brut)
+            .on_input(Message::ContentChanged))
             .padding(40)
             .into()
     }
