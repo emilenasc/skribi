@@ -83,22 +83,37 @@ impl Skribi {
             elements.push(text(&p.contenu).size(size).into());
         }
 
+        let button_titre1 = if self.style_actuel == StyleParagraphe::Titre1 {
+            button("Titre1")
+        } else {
+            button("Titre 1").on_press(Message::StyleChanged(StyleParagraphe::Titre1))
+        };
+
+        let button_titre2 = if self.style_actuel == StyleParagraphe::Titre2 {
+            button("Titre2")
+        } else {
+            button("Titre 2").on_press(Message::StyleChanged(StyleParagraphe::Titre2))
+        };
+
+        let button_citation = if self.style_actuel == StyleParagraphe::Citation {
+            button("Citation")
+        } else {
+            button("Citation").on_press(Message::StyleChanged(StyleParagraphe::Citation))
+        };
+
+        let button_normal = if self.style_actuel == StyleParagraphe::Normal {
+            button("Normal")
+        } else {
+            button("Normal").on_press(Message::StyleChanged(StyleParagraphe::Normal))
+        };
+
         Column::new()
             .push(
                 Row::new()
-                    .push(
-                        button("Titre 1").on_press(Message::StyleChanged(StyleParagraphe::Titre1)),
-                    )
-                    .push(
-                        button("Titre 2").on_press(Message::StyleChanged(StyleParagraphe::Titre2)),
-                    )
-                    .push(
-                        button("Citation")
-                            .on_press(Message::StyleChanged(StyleParagraphe::Citation)),
-                    )
-                    .push(
-                        button("Normal").on_press(Message::StyleChanged(StyleParagraphe::Normal)),
-                    ),
+                    .push(button_titre1)
+                    .push(button_titre2)
+                    .push(button_citation)
+                    .push(button_normal),
             )
             .push(scrollable(
                 container(
