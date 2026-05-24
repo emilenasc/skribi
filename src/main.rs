@@ -50,17 +50,19 @@ impl Skribi {
 
     // Dessine l'interface
     fn view(&self) -> Element<'_, Message> {
-        let mut paragraph: Vec<Element<'_, Message>> = Vec::new();
+        let mut elements: Vec<Element<'_, Message>> = Vec::new();
+
+          elements.push(
+            text_input("placeholder", &self.contenu_brut)
+                .on_input(Message::ContentChanged)
+                .into(),
+        );
 
         for p in self.document.paragraphes.iter() {
-            paragraph.push(text(&p.contenu).size(16).into());
+            elements.push(text(&p.contenu).size(16).into());
         }
 
-        Column::with_children(paragraph)
-            .push(text_input("placeholder", &self.contenu_brut)
-            .on_input(Message::ContentChanged))
-            .padding(40)
-            .into()
+        Column::with_children(elements).padding(40).into()
     }
 
     fn theme(&self) -> Theme {
