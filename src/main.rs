@@ -1,19 +1,20 @@
 mod document;
 mod paragraphe;
 
+use crate::document::Document;
+use crate::paragraphe::{Paragraphe, StyleParagraphe};
+use iced::widget::{text, Column};
 use iced::{Element, Task, Theme};
-use iced::widget::{column, text};
 
 pub fn main() -> iced::Result {
     iced::application("Skribi", Skribi::update, Skribi::view)
         .theme(Skribi::theme)
-        .run()
+        .run_with(|| (Skribi::new(), Task::none()))
 }
 
 // L'état de l'application
-#[derive(Default)]
 struct Skribi {
-    contenu: String,
+    document: Document,
 }
 
 // Les messages — ce que l'utilisateur peut faire
@@ -23,10 +24,16 @@ enum Message {
 }
 
 impl Skribi {
-    // État initial
     fn new() -> Self {
+        let mut paragraphes: Vec<Paragraphe> = Vec::new();
+        paragraphes.push(Paragraphe::nouveau("Titre", StyleParagraphe::Titre1));
+        paragraphes.push(Paragraphe::nouveau(
+            "Hello, world!",
+            StyleParagraphe::Normal,
+        ));
+
         Skribi {
-            contenu: String::from("Bienvenue dans Skribi !"),
+            document: Document { paragraphes },
         }
     }
 
@@ -38,14 +45,15 @@ impl Skribi {
     }
 
     // Dessine l'interface
-    fn view(&self) -> Element<'_,Message> {
-    column![
-        text("Skribi").size(32),
-        text("Bienvenue dans Skribi !").size(16),
-    ]
-    .padding(40)
-    .into()
-}
+    fn view(&self) -> Element<'_, Message> {
+        let mut paragraph: Vec<Element<'_, Message>> = Vec::new();
+
+        for p in self.document.paragraphes.iter() {
+            paragraph.push(text(&p.contenu).size(16).into());
+        }
+
+        Column::with_children(paragraph).padding(40).into()
+    }
 
     fn theme(&self) -> Theme {
         Theme::Dark
