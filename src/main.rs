@@ -5,8 +5,7 @@ use crate::document::Document;
 use crate::paragraphe::{Paragraphe, StyleParagraphe};
 use iced::alignment::Horizontal;
 use iced::widget::text_input;
-use iced::widget::{container, scrollable};
-use iced::widget::{text, Column};
+use iced::widget::{button, container, scrollable, text, Column, Row};
 use iced::{Color, Length};
 use iced::{Element, Task, Theme};
 
@@ -20,6 +19,7 @@ pub fn main() -> iced::Result {
 struct Skribi {
     document: Document,
     contenu_brut: String,
+    style_actuel: StyleParagraphe,
 }
 
 // Les messages — ce que l'utilisateur peut faire
@@ -27,6 +27,7 @@ struct Skribi {
 enum Message {
     ContentChanged(String),
     ContentSubmit,
+    StyleChanged(StyleParagraphe),
 }
 
 impl Skribi {
@@ -41,6 +42,7 @@ impl Skribi {
         Skribi {
             document: Document { paragraphes },
             contenu_brut: String::new(),
+            style_actuel: StyleParagraphe::Normal,
         }
     }
 
@@ -49,12 +51,12 @@ impl Skribi {
         match message {
             Message::ContentChanged(content) => self.contenu_brut = content,
             Message::ContentSubmit => {
-                self.document.paragraphes.push(Paragraphe::nouveau(
-                    &self.contenu_brut,
-                    StyleParagraphe::Normal,
-                ));
+                self.document
+                    .paragraphes
+                    .push(Paragraphe::nouveau(&self.contenu_brut, self.style_actuel));
                 self.contenu_brut = String::new();
             }
+            Message::StyleChanged(style) => self.style_actuel = style,
         };
 
         Task::none()
@@ -81,29 +83,43 @@ impl Skribi {
             elements.push(text(&p.contenu).size(size).into());
         }
 
-        container(scrollable(
-            container(
-                container(Column::with_children(elements).padding(40))
-                    .style(|_| iced::widget::container::Style {
-                        background: Some(iced::Background::Color(Color::WHITE)),
-                        ..Default::default()
-                    })
-                    .width(595.0)
-                    .height(842.0)
-                    .padding(60),
+        Column::new()
+            .push(
+                Row::new()
+                    .push(
+                        button("Titre 1").on_press(Message::StyleChanged(StyleParagraphe::Titre1)),
+                    )
+                    .push(
+                        button("Titre 2").on_press(Message::StyleChanged(StyleParagraphe::Titre2)),
+                    )
+                    .push(
+                        button("Citation")
+                            .on_press(Message::StyleChanged(StyleParagraphe::Citation)),
+                    )
+                    .push(
+                        button("Normal").on_press(Message::StyleChanged(StyleParagraphe::Normal)),
+                    ),
             )
-            .width(Length::Fill)
-            .align_x(Horizontal::Center)
-            .padding(60),
-        ))
-        .style(|_| iced::widget::container::Style {
-            background: Some(iced::Background::Color(Color::from_rgb(0.25, 0.25, 0.25))),
-            ..Default::default()
-        })
-        .width(Length::Fill)
-        .height(Length::Fill)
-        .align_x(Horizontal::Center)
-        .into()
+            .push(scrollable(
+                container(
+                    container(Column::with_children(elements).padding(40))
+                        .style(|_| iced::widget::container::Style {
+                            background: Some(iced::Background::Color(Color::WHITE)),
+                            ..Default::default()
+                        })
+                        .width(595.0)
+                        .height(842.0)
+                        .padding(60),
+                )
+                .style(|_| iced::widget::container::Style {
+                    background: Some(iced::Background::Color(Color::from_rgb(0.25, 0.25, 0.25))),
+                    ..Default::default()
+                })
+                .width(Length::Fill)
+                .align_x(Horizontal::Center)
+                .padding(40),
+            ))
+            .into()
     }
 
     fn theme(&self) -> Theme {

@@ -1,3 +1,4 @@
+#[derive(Debug, Clone, Copy)]
 pub enum StyleParagraphe {
     Normal,
     Titre1,
