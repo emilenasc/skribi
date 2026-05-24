@@ -23,6 +23,7 @@ struct Skribi {
 #[derive(Debug, Clone)]
 enum Message {
     ContentChanged(String),
+    ContentSubmit,
 }
 
 impl Skribi {
@@ -44,7 +45,12 @@ impl Skribi {
     fn update(&mut self, message: Message) -> Task<Message> {
         match message {
             Message::ContentChanged(content) => self.contenu_brut = content,
+            Message::ContentSubmit => {
+                self.document.paragraphes.push(Paragraphe::nouveau(&self.contenu_brut, StyleParagraphe::Normal));
+                self.contenu_brut = String::new();
+            }
         };
+    
         Task::none()
     }
 
@@ -55,6 +61,7 @@ impl Skribi {
           elements.push(
             text_input("placeholder", &self.contenu_brut)
                 .on_input(Message::ContentChanged)
+                .on_submit(Message::ContentSubmit)
                 .into(),
         );
 
