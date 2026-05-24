@@ -3,8 +3,12 @@ mod paragraphe;
 
 use crate::document::Document;
 use crate::paragraphe::{Paragraphe, StyleParagraphe};
+use iced::alignment::Horizontal;
 use iced::widget::text_input;
+use iced::widget::{container, scrollable};
 use iced::widget::{text, Column};
+use iced::Length::Fill;
+use iced::{Color, Length};
 use iced::{Element, Task, Theme};
 
 pub fn main() -> iced::Result {
@@ -46,11 +50,14 @@ impl Skribi {
         match message {
             Message::ContentChanged(content) => self.contenu_brut = content,
             Message::ContentSubmit => {
-                self.document.paragraphes.push(Paragraphe::nouveau(&self.contenu_brut, StyleParagraphe::Normal));
+                self.document.paragraphes.push(Paragraphe::nouveau(
+                    &self.contenu_brut,
+                    StyleParagraphe::Normal,
+                ));
                 self.contenu_brut = String::new();
             }
         };
-    
+
         Task::none()
     }
 
@@ -58,7 +65,7 @@ impl Skribi {
     fn view(&self) -> Element<'_, Message> {
         let mut elements: Vec<Element<'_, Message>> = Vec::new();
 
-          elements.push(
+        elements.push(
             text_input("placeholder", &self.contenu_brut)
                 .on_input(Message::ContentChanged)
                 .on_submit(Message::ContentSubmit)
@@ -69,10 +76,32 @@ impl Skribi {
             elements.push(text(&p.contenu).size(16).into());
         }
 
-        Column::with_children(elements).padding(40).into()
+        container(scrollable(
+            container(
+                container(Column::with_children(elements).padding(40))
+                    .style(|_| iced::widget::container::Style {
+                        background: Some(iced::Background::Color(Color::WHITE)),
+                        ..Default::default()
+                    })
+                    .width(595.0)
+                    .height(842.0)
+                    .padding(60),
+            )
+            .width(Length::Fill)
+            .align_x(Horizontal::Center)
+            .padding(60),
+        ))
+        .style(|_| iced::widget::container::Style {
+            background: Some(iced::Background::Color(Color::from_rgb(0.25, 0.25, 0.25))),
+            ..Default::default()
+        })
+        .width(Length::Fill)
+        .height(Length::Fill)
+        .align_x(Horizontal::Center)
+        .into()
     }
 
     fn theme(&self) -> Theme {
-        Theme::Dark
+        Theme::Light
     }
 }
