@@ -1,28 +1,53 @@
 mod document;
 mod paragraphe;
 
-use document::{Document, ajouter_paragraphe_valide};
-use paragraphe::{Paragraphe, StyleParagraphe};
+use iced::{Element, Task, Theme};
+use iced::widget::{column, text};
 
-fn main() {
-    let mut doc = Document::nouveau();
+pub fn main() -> iced::Result {
+    iced::application("Skribi", Skribi::update, Skribi::view)
+        .theme(Skribi::theme)
+        .run()
+}
 
-    doc.ajouter_paragraphe(Paragraphe::nouveau("Titre niveau 1", StyleParagraphe::Titre1));
-    doc.ajouter_paragraphe(Paragraphe::nouveau("Titre niveau 2", StyleParagraphe::Titre2));
-    doc.ajouter_paragraphe(Paragraphe::nouveau("Citation", StyleParagraphe::Citation));
-    doc.ajouter_paragraphe(Paragraphe::nouveau("Texte normal", StyleParagraphe::Normal));
+// L'état de l'application
+#[derive(Default)]
+struct Skribi {
+    contenu: String,
+}
 
-    doc.afficher();
-    doc.obtenir_paragraphe(0);
-    doc.obtenir_paragraphe(99);
+// Les messages — ce que l'utilisateur peut faire
+#[derive(Debug, Clone)]
+enum Message {
+    Rien,
+}
 
-    match ajouter_paragraphe_valide(&mut doc, "Bonjour", StyleParagraphe::Normal) {
-        Ok(msg) => println!("✓ {}", msg),
-        Err(e) => println!("✗ {}", e),
+impl Skribi {
+    // État initial
+    fn new() -> Self {
+        Skribi {
+            contenu: String::from("Bienvenue dans Skribi !"),
+        }
     }
 
-    match ajouter_paragraphe_valide(&mut doc, "", StyleParagraphe::Normal) {
-        Ok(msg) => println!("✓ {}", msg),
-        Err(e) => println!("✗ {}", e),
+    // Modifie l'état selon le message
+    fn update(&mut self, message: Message) -> Task<Message> {
+        match message {
+            Message::Rien => Task::none(),
+        }
+    }
+
+    // Dessine l'interface
+    fn view(&self) -> Element<'_,Message> {
+    column![
+        text("Skribi").size(32),
+        text("Bienvenue dans Skribi !").size(16),
+    ]
+    .padding(40)
+    .into()
+}
+
+    fn theme(&self) -> Theme {
+        Theme::Dark
     }
 }
