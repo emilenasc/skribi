@@ -88,29 +88,14 @@ impl Skribi {
             );
         }
 
-        let button_titre1 = if self.style_actuel == StyleParagraphe::Titre1 {
-            button("Titre1")
-        } else {
-            button("Titre 1").on_press(Message::StyleChanged(StyleParagraphe::Titre1))
-        };
-
-        let button_titre2 = if self.style_actuel == StyleParagraphe::Titre2 {
-            button("Titre2")
-        } else {
-            button("Titre 2").on_press(Message::StyleChanged(StyleParagraphe::Titre2))
-        };
-
-        let button_citation = if self.style_actuel == StyleParagraphe::Citation {
-            button("Citation")
-        } else {
-            button("Citation").on_press(Message::StyleChanged(StyleParagraphe::Citation))
-        };
-
-        let button_normal = if self.style_actuel == StyleParagraphe::Normal {
-            button("Normal")
-        } else {
-            button("Normal").on_press(Message::StyleChanged(StyleParagraphe::Normal))
-        };
+        let button_titre1 =
+            Skribi::bouton_style("Titre 1", StyleParagraphe::Titre1, self.style_actuel);
+        let button_titre2 =
+            Skribi::bouton_style("Titre 2", StyleParagraphe::Titre2, self.style_actuel);
+        let button_citation =
+            Skribi::bouton_style("Citation", StyleParagraphe::Citation, self.style_actuel);
+        let button_normal =
+            Skribi::bouton_style("Normal", StyleParagraphe::Normal, self.style_actuel);
 
         Column::new()
             .push(
@@ -144,5 +129,17 @@ impl Skribi {
 
     fn theme(&self) -> Theme {
         Theme::Light
+    }
+
+    fn bouton_style(
+        label: &str,
+        style: StyleParagraphe,
+        actuel: StyleParagraphe,
+    ) -> iced::widget::Button<Message> {
+        if actuel == style {
+            button(label)
+        } else {
+            button(label).on_press(Message::StyleChanged(style))
+        }
     }
 }
