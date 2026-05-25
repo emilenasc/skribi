@@ -24,6 +24,7 @@ enum Message {
     ContentChanged(String),
     ContentSubmit,
     StyleChanged(StyleParagraphe),
+    ContentDelete(usize),
 }
 
 impl Skribi {
@@ -53,6 +54,9 @@ impl Skribi {
                 self.contenu_brut = String::new();
             }
             Message::StyleChanged(style) => self.style_actuel = style,
+            Message::ContentDelete(index) => {
+                self.document.paragraphes.remove(index);
+            }
         };
 
         Task::none()
@@ -69,14 +73,19 @@ impl Skribi {
                 .into(),
         );
 
-        for p in self.document.paragraphes.iter() {
+        for (index, p) in self.document.paragraphes.iter().enumerate() {
             let size = match p.style {
                 StyleParagraphe::Titre1 => 24.0,
                 StyleParagraphe::Normal => 16.0,
                 StyleParagraphe::Titre2 => 20.0,
                 StyleParagraphe::Citation => 16.0,
             };
-            elements.push(text(&p.contenu).size(size).into());
+            elements.push(
+                Row::new()
+                    .push(text(&p.contenu).size(size))
+                    .push(button("X").on_press(Message::ContentDelete(index)))
+                    .into(),
+            );
         }
 
         let button_titre1 = if self.style_actuel == StyleParagraphe::Titre1 {
